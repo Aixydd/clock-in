@@ -30,7 +30,7 @@
 
         /* ========== 顶部三分之一：时间 ========== */
         .time-card {
-            background: #FFFFFF;
+            background: linear-gradient(165deg, #FFFFFF 0%, #FDF8EF 60%, #FAF2E3 100%);
             border-radius: 28px;
             box-shadow: 0 6px 24px rgba(120,100,70,0.08);
             height: 33vh;
@@ -40,12 +40,14 @@
             align-items: center;
             justify-content: center;
             padding: 24px 20px;
+            border: 1px solid #F0E8D8;
         }
         .date-line {
-            font-size: 17px;
-            color: #A79E92;
+            font-size: 22px;
+            color: #8F8575;
             letter-spacing: 1px;
             margin-bottom: 12px;
+            font-weight: 500;
         }
         .clock-time {
             font-size: min(34vw, 160px);
@@ -57,13 +59,14 @@
         }
         .status-pill {
             display: inline-block;
-            margin-top: 16px;
-            padding: 8px 22px;
+            margin-top: 18px;
+            padding: 12px 30px;
             border-radius: 999px;
             background: #F3EDE2;
             color: #8A7F6F;
-            font-size: 15px;
-            letter-spacing: 1px;
+            font-size: 20px;
+            letter-spacing: 2px;
+            font-weight: 500;
         }
         .status-pill.working {
             background: #E8F0E4;
@@ -110,9 +113,10 @@
 
         /* ========== 底部：记录（自动填满） ========== */
         .records {
-            background: #FFFFFF;
+            background: linear-gradient(180deg, #FFFFFF 0%, #FDFAF3 100%);
             border-radius: 28px;
             box-shadow: 0 6px 24px rgba(120,100,70,0.08);
+            border: 1px solid #F0E8D8;
             flex: 1;
             min-height: 0;
             overflow-y: auto;
