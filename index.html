@@ -188,6 +188,15 @@
         .mascot-center.on-holiday {
             filter: drop-shadow(0 0 16px rgba(122, 158, 204, 0.85));
         }
+        .mascot-text {
+            position: absolute;
+            left: 50%;
+            top: 58%;
+            transform: translate(-50%, -50%);
+            width: min(40vw, 220px);
+            pointer-events: none;
+            z-index: 2;
+        }
         .records-head, #todayContent, #durationBox, #historyList {
             position: relative;
             z-index: 1;
@@ -373,7 +382,8 @@
 
         <!-- 底部：记录 -->
         <div class="records">
-            <img class="mascot-center" src="character_cut.png" alt="角色" onclick="toggleHoliday()">
+            <img class="mascot-center" src="character_body.png" alt="角色" onclick="toggleHoliday()">
+            <img class="mascot-text" src="character_text.png" alt="文字">
             <div class="records-head">
                 <h3>最近记录</h3>
                 <span class="count" id="recordCount"></span>
