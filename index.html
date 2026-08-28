@@ -10,177 +10,176 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: #F5F0E8;
             color: #4A4540;
-            min-height: 100vh;
-            min-height: 100dvh;
             display: flex;
-            align-items: center;
             justify-content: center;
         }
 
         .container {
             max-width: 480px;
-            width: 90%;
-            padding: 20px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
         }
 
+        /* ========== 顶部：标题 ========== */
         .header {
             text-align: center;
-            padding: 20px 0 32px;
+            padding: 8px 0 16px;
+            flex-shrink: 0;
         }
         .header h1 {
-            font-size: 56px;
+            font-size: 24px;
             font-weight: 700;
-            color: #4A4540;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
         }
         .header .date {
-            font-size: 24px;
+            font-size: 15px;
             color: #A09890;
-            margin-top: 14px;
+            margin-top: 6px;
         }
 
-        .clock-card {
+        /* ========== 上三分之一：时间区 ========== */
+        .time-section {
+            height: 33vh;
             background: #FFFDF8;
-            border-radius: 36px;
-            padding: 56px 36px;
-            margin-bottom: 32px;
-            box-shadow: 0 6px 28px rgba(100,90,70,0.12);
+            border-radius: 32px;
+            box-shadow: 0 4px 20px rgba(100,90,70,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
         .clock-time {
-            text-align: center;
-            font-size: 120px;
+            font-size: 88px;
             font-weight: 700;
-            color: #4A4540;
             font-variant-numeric: tabular-nums;
-            margin-bottom: 16px;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
         }
         .clock-status {
-            text-align: center;
-            font-size: 28px;
+            font-size: 20px;
             color: #A09890;
-            margin-bottom: 40px;
+            margin-top: 10px;
         }
-        .buttons {
+
+        /* ========== 中间：按钮区 ========== */
+        .button-section {
             display: flex;
             gap: 20px;
+            padding: 24px 0;
+            flex-shrink: 0;
         }
         .btn {
             flex: 1;
-            padding: 36px 20px;
+            padding: 28px 16px;
             border: none;
             border-radius: 24px;
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
         }
         .btn:active { transform: scale(0.96); opacity: 0.9; }
         .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
         .btn-start {
             background: #7BA17B;
             color: white;
-            box-shadow: 0 3px 10px rgba(123,161,123,0.3);
+            box-shadow: 0 6px 20px rgba(123,161,123,0.35);
         }
         .btn-end {
             background: #C4A882;
             color: white;
-            box-shadow: 0 3px 10px rgba(196,168,130,0.3);
+            box-shadow: 0 6px 20px rgba(196,168,130,0.35);
         }
 
-        .today-card {
+        /* ========== 底部：记录区（自动填满剩余空间） ========== */
+        .record-section {
             background: #FFFDF8;
-            border-radius: 36px;
-            padding: 40px 36px;
-            margin-bottom: 32px;
-            box-shadow: 0 6px 28px rgba(100,90,70,0.12);
+            border-radius: 32px;
+            box-shadow: 0 4px 20px rgba(100,90,70,0.1);
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            padding: 24px 28px;
         }
-        .today-card h3 {
-            font-size: 24px;
+        .record-section h3 {
+            font-size: 20px;
             color: #A09890;
             font-weight: 600;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             letter-spacing: 2px;
         }
         .record-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 0;
+            padding: 14px 0;
         }
         .record-label {
-            font-size: 28px;
+            font-size: 20px;
             color: #6B6560;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
         .record-label .dot {
-            width: 18px; height: 18px;
+            width: 12px; height: 12px;
             border-radius: 50%;
         }
         .record-label .dot.start { background: #7BA17B; }
         .record-label .dot.end { background: #C4A882; }
         .record-value {
-            font-size: 36px;
+            font-size: 24px;
             font-weight: 700;
-            color: #4A4540;
             font-variant-numeric: tabular-nums;
         }
         .duration {
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 3px solid #EDE8E0;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 2px solid #EDE8E0;
             text-align: center;
-            font-size: 24px;
+            font-size: 18px;
             color: #A09890;
         }
         .duration strong {
             color: #4A4540;
-            font-size: 36px;
+            font-size: 26px;
             font-weight: 700;
         }
-
-        .history-card {
-            background: #FFFDF8;
-            border-radius: 36px;
-            padding: 40px 36px;
-            box-shadow: 0 6px 28px rgba(100,90,70,0.12);
-        }
-        .history-card h3 {
-            font-size: 24px;
-            color: #A09890;
-            font-weight: 600;
-            margin-bottom: 24px;
-            letter-spacing: 2px;
-        }
         .history-item {
-            padding: 24px 0;
-            border-bottom: 2px solid #EDE8E0;
+            padding: 18px 0;
+            border-bottom: 1px solid #EDE8E0;
         }
         .history-item:last-child { border-bottom: none; }
         .history-date {
-            font-size: 22px;
+            font-size: 17px;
             color: #C0B8B0;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-weight: 500;
         }
         .history-times {
             display: flex;
-            gap: 28px;
-            font-size: 26px;
+            gap: 24px;
+            font-size: 20px;
             color: #6B6560;
         }
         .empty {
             text-align: center;
             color: #D0C8C0;
-            padding: 48px 16px;
-            font-size: 24px;
+            padding: 40px 16px;
+            font-size: 20px;
         }
 
         .toast {
@@ -189,14 +188,15 @@
             transform: translate(-50%, -50%);
             background: rgba(74,69,64,0.9);
             color: white;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 14px;
+            padding: 18px 32px;
+            border-radius: 16px;
+            font-size: 18px;
             font-weight: 500;
             opacity: 0;
             transition: opacity 0.25s;
             pointer-events: none;
             z-index: 100;
+            letter-spacing: 1px;
         }
         .toast.show { opacity: 1; }
     </style>
@@ -208,23 +208,23 @@
             <div class="date" id="currentDate"></div>
         </div>
 
-        <div class="clock-card">
+        <!-- 顶部三分之一：时间 -->
+        <div class="time-section">
             <div class="clock-time" id="currentTime">--:--</div>
             <div class="clock-status" id="statusLabel">等待打卡</div>
-            <div class="buttons">
-                <button class="btn btn-start" id="btnStart" onclick="clockIn()">上班打卡</button>
-                <button class="btn btn-end" id="btnEnd" onclick="clockOut()">下班打卡</button>
-            </div>
         </div>
 
-        <div class="today-card" id="todayRecord" style="display:none">
-            <h3>今日记录</h3>
+        <!-- 中间：按钮 -->
+        <div class="button-section">
+            <button class="btn btn-start" id="btnStart" onclick="clockIn()">上班打卡</button>
+            <button class="btn btn-end" id="btnEnd" onclick="clockOut()">下班打卡</button>
+        </div>
+
+        <!-- 底部：记录 -->
+        <div class="record-section">
+            <h3>最近记录</h3>
             <div id="todayContent"></div>
             <div class="duration" id="durationBox" style="display:none"></div>
-        </div>
-
-        <div class="history-card">
-            <h3>最近记录</h3>
             <div id="historyList">
                 <div class="empty">暂无记录</div>
             </div>
@@ -272,7 +272,6 @@
 
         function updateUI() {
             const rec = getTodayRecord();
-            const box = document.getElementById('todayRecord');
             const content = document.getElementById('todayContent');
             const dur = document.getElementById('durationBox');
             const label = document.getElementById('statusLabel');
@@ -280,7 +279,6 @@
             const btnE = document.getElementById('btnEnd');
 
             if (rec) {
-                box.style.display = 'block';
                 let h = '';
                 if (rec.start) h += `<div class="record-row"><div class="record-label"><span class="dot start"></span>上班</div><div class="record-value">${formatTime(rec.start)}</div></div>`;
                 if (rec.end) h += `<div class="record-row"><div class="record-label"><span class="dot end"></span>下班</div><div class="record-value">${formatTime(rec.end)}</div></div>`;
@@ -296,9 +294,10 @@
                     dur.style.display = 'none';
                 }
             } else {
-                box.style.display = 'none';
+                content.innerHTML = '';
                 label.textContent = '等待打卡';
                 btnS.disabled = false; btnE.disabled = false;
+                dur.style.display = 'none';
             }
             updateHistory();
         }
