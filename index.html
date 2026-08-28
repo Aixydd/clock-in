@@ -383,7 +383,6 @@
         <!-- 底部：记录 -->
         <div class="records">
             <img class="mascot-center" src="character_body.png" alt="角色" onclick="toggleHoliday()">
-            <img class="mascot-text" src="character_text.png" alt="文字">
             <div class="records-head">
                 <h3>最近记录</h3>
                 <span class="count" id="recordCount"></span>
@@ -472,6 +471,31 @@
             return `${Math.floor(ms/3600000)}小时${Math.floor((ms%3600000)/60000)}分钟`;
         }
 
+        function getCharacterImage() {
+            const rec = getTodayRecord();
+            const isHoliday = rec && rec.holiday;
+            const sessions = toSessions(rec);
+            
+            if (isHoliday) {
+                return 'character_rest_holiday.png';  // 放假
+            }
+            
+            if (sessions.length === 0) {
+                return 'character_body.png';  // 未打卡，用默认形象
+            }
+            
+            const completed = sessions.length >= MAX_SESSIONS && sessions.every(s => s.start && s.end);
+            const hasOpen = sessions.some(s => s.start && !s.end);
+            
+            if (completed) {
+                return 'character_work_end.png';  // 全部完成，"人，上班辛苦了"
+            } else if (hasOpen) {
+                return 'character_work_start.png';  // 工作中，"人，又上班了"
+            } else {
+                return 'character_work_start.png';  // 部分完成，用工作形象
+            }
+        }
+
         function updateUI() {
             const rec = getTodayRecord();
             const content = document.getElementById('todayContent');
@@ -480,7 +504,11 @@
             const btnS = document.getElementById('btnStart');
             const btnE = document.getElementById('btnEnd');
             const isHoliday = !!(rec && rec.holiday);
-            document.querySelector('.mascot-center').classList.toggle('on-holiday', isHoliday);
+            
+            // 切换糯糯形象
+            const mascot = document.querySelector('.mascot-center');
+            mascot.src = getCharacterImage();
+            mascot.classList.toggle('on-holiday', isHoliday);
 
             if (isHoliday) {
                 content.innerHTML = '<div class="holiday-info">🏖 今天放假，不记录打卡</div>';
