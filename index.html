@@ -30,6 +30,7 @@
 
         /* ========== 顶部三分之一：时间 ========== */
         .time-card {
+            position: relative;
             background: linear-gradient(165deg, #FFFFFF 0%, #FDF8EF 60%, #FAF2E3 100%);
             border-radius: 28px;
             box-shadow: 0 6px 24px rgba(120,100,70,0.08);
@@ -41,6 +42,22 @@
             justify-content: center;
             padding: 24px 20px;
             border: 1px solid #F0E8D8;
+        }
+        .mascot {
+            position: absolute;
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center 28%;
+            border: 3px solid #FFFFFF;
+            box-shadow: 0 4px 14px rgba(120,100,70,0.3);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .time-card .mascot {
+            top: -24px;
+            left: 18px;
         }
         .date-line {
             font-size: 22px;
@@ -113,6 +130,7 @@
 
         /* ========== 底部：记录（自动填满） ========== */
         .records {
+            position: relative;
             background: linear-gradient(180deg, #FFFFFF 0%, #FDFAF3 100%);
             border-radius: 28px;
             box-shadow: 0 6px 24px rgba(120,100,70,0.08);
@@ -123,6 +141,10 @@
             padding: 22px 22px 16px;
             display: flex;
             flex-direction: column;
+        }
+        .records .mascot {
+            top: -24px;
+            right: 18px;
         }
         .records-head {
             display: flex;
@@ -256,6 +278,7 @@
     <div class="container">
         <!-- 顶部三分之一：时间 -->
         <div class="time-card">
+            <img class="mascot" src="gif1.gif" alt="角色">
             <div class="date-line" id="currentDate"></div>
             <div class="clock-time" id="currentTime">--:--</div>
             <div class="status-pill" id="statusLabel">等待打卡</div>
@@ -275,6 +298,7 @@
 
         <!-- 底部：记录 -->
         <div class="records">
+            <img class="mascot" src="gif2.gif" alt="角色">
             <div class="records-head">
                 <h3>最近记录</h3>
                 <span class="count" id="recordCount"></span>
