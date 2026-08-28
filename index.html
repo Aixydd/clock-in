@@ -160,6 +160,19 @@
             top: -28px;
             right: 14px;
         }
+        .mascot-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(34vw, 190px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .records-head, #todayContent, #durationBox, #historyList {
+            position: relative;
+            z-index: 1;
+        }
         .records-head {
             display: flex;
             justify-content: space-between;
@@ -341,6 +354,7 @@
         <!-- 底部：记录 -->
         <div class="records">
             <img class="mascot" src="gif2.gif" alt="角色">
+            <img class="mascot-center" src="character_cut.png" alt="角色">
             <div class="records-head">
                 <h3>最近记录</h3>
                 <span class="count" id="recordCount"></span>
