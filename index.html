@@ -373,26 +373,48 @@
         function saveRecords(r) { localStorage.setItem('clockRecords', JSON.stringify(r)); }
         function getTodayRecord() { return getRecords()[getToday()] || null; }
 
+        // 兼容旧数据格式：{start, end} → [{start, end}]
+        function toSessions(rec) {
+            if (!rec) return [];
+            if (rec.sessions) return rec.sessions;
+            return [{ start: rec.start || null, end: rec.end || null }];
+        }
+
+        const MAX_SESSIONS = 3; // 每天 3 组上下班
+
         function clockIn() {
             const records = getRecords(), today = getToday();
-            if (records[today] && records[today].start) { showToast('今天已经打过上班卡了'); return; }
-            records[today] = { ...records[today], start: new Date().toISOString() };
+            const day = records[today] || { sessions: [] };
+            const sessions = day.sessions || [];
+            if (sessions.length >= MAX_SESSIONS) {
+                showToast(`今天已打满 ${MAX_SESSIONS} 次上班卡`);
+                return;
+            }
+            const last = sessions[sessions.length - 1];
+            if (last && !last.end) { showToast('请先打下班卡'); return; }
+            sessions.push({ start: new Date().toISOString(), end: null });
+            day.sessions = sessions;
+            records[today] = day;
             saveRecords(records);
-            showToast('上班打卡成功');
+            showToast(`第 ${sessions.length} 次上班打卡成功`);
             updateUI();
         }
         function clockOut() {
             const records = getRecords(), today = getToday();
-            if (!records[today] || !records[today].start) { showToast('请先打上班卡'); return; }
-            if (records[today].end) { showToast('今天已经打过下班卡了'); return; }
-            records[today].end = new Date().toISOString();
+            const day = records[today];
+            const sessions = day ? (day.sessions || []) : [];
+            if (!sessions.length) { showToast('请先打上班卡'); return; }
+            const last = sessions[sessions.length - 1];
+            if (last.end) { showToast('请先打上班卡'); return; }
+            last.end = new Date().toISOString();
             saveRecords(records);
-            showToast('下班打卡成功');
+            const completed = sessions.length >= MAX_SESSIONS && sessions.every(s => s.start && s.end);
+            showToast(completed ? '下班打卡成功，今日全部完成！' : `第 ${sessions.length} 次下班打卡成功`);
             updateUI();
         }
-        function calcDuration(s, e) {
-            if (!s || !e) return null;
-            const ms = new Date(e) - new Date(s);
+        function calcTotalDuration(sessions) {
+            let ms = 0;
+            sessions.forEach(s => { if (s.start && s.end) ms += new Date(s.end) - new Date(s.start); });
             return `${Math.floor(ms/3600000)}小时${Math.floor((ms%3600000)/60000)}分钟`;
         }
 
@@ -404,21 +426,36 @@
             const btnS = document.getElementById('btnStart');
             const btnE = document.getElementById('btnEnd');
 
-            if (rec) {
+            const sessions = toSessions(rec);
+
+            if (sessions.length) {
                 let h = '';
-                if (rec.start) h += `<div class="record-row"><div class="record-label"><span class="dot start"></span>上班</div><div class="record-value">${formatTime(rec.start)}</div></div>`;
-                if (rec.end) h += `<div class="record-row"><div class="record-label"><span class="dot end"></span>下班</div><div class="record-value">${formatTime(rec.end)}</div></div>`;
+                sessions.forEach((s, i) => {
+                    const num = sessions.length > 1 ? i + 1 : '';
+                    h += `<div class="record-row"><div class="record-label"><span class="dot start"></span>上班${num}</div><div class="record-value">${formatTime(s.start)}</div></div>`;
+                    if (s.end) h += `<div class="record-row"><div class="record-label"><span class="dot end"></span>下班${num}</div><div class="record-value">${formatTime(s.end)}</div></div>`;
+                });
                 content.innerHTML = h;
-                if (rec.start && rec.end) {
+
+                const completed = sessions.length >= MAX_SESSIONS && sessions.every(s => s.start && s.end);
+                const hasOpen = sessions.some(s => s.start && !s.end);
+
+                if (completed) {
+                    // 最后一次打卡后自动计算今日上班总时长
                     dur.style.display = 'block';
-                    dur.innerHTML = `今日工作时长 <strong>${calcDuration(rec.start, rec.end)}</strong>`;
+                    dur.innerHTML = `今日工作时长 <strong>${calcTotalDuration(sessions)}</strong>`;
                     label.textContent = '今日已完成';
                     label.className = 'status-pill done';
                     btnS.disabled = true; btnE.disabled = true;
-                } else {
-                    label.textContent = '工作中';
+                } else if (hasOpen) {
+                    label.textContent = `工作中 · 第 ${sessions.length} 次`;
                     label.className = 'status-pill working';
                     btnS.disabled = true; btnE.disabled = false;
+                    dur.style.display = 'none';
+                } else {
+                    label.textContent = `已完成 ${sessions.length}/${MAX_SESSIONS} 次`;
+                    label.className = 'status-pill';
+                    btnS.disabled = false; btnE.disabled = false;
                     dur.style.display = 'none';
                 }
             } else {
@@ -444,12 +481,21 @@
             let h = '';
             dates.forEach(d => {
                 const r = records[d];
-                h += `<div class="history-item"><div class="history-date">${formatDate(d)}</div><div class="history-times">
-                    <span>上班 ${formatTime(r.start)}</span>
-                    ${r.end ? `<span>下班 ${formatTime(r.end)}</span>` : '<span style="color:#C0B6A6">未打下班卡</span>'}
-                </div></div>`;
+                const sessions = toSessions(r);
+                if (!sessions.length) return;
+                h += `<div class="history-item"><div class="history-date">${formatDate(d)}</div>`;
+                sessions.forEach((s, i) => {
+                    const num = sessions.length > 1 ? i + 1 : '';
+                    h += `<div class="history-times">
+                        <span>上班${num} ${formatTime(s.start)}</span>
+                        ${s.end ? `<span>下班${num} ${formatTime(s.end)}</span>` : '<span style="color:#C0B6A6">未打下班卡</span>'}
+                    </div>`;
+                });
+                const allDone = sessions.length >= MAX_SESSIONS && sessions.every(s => s.start && s.end);
+                if (allDone) h += `<div class="history-times" style="color:#5F7D5B;font-weight:600;margin-top:4px"><span>总时长 ${calcTotalDuration(sessions)}</span></div>`;
+                h += '</div>';
             });
-            el.innerHTML = h;
+            el.innerHTML = h || '<div class="empty"><div class="art">🕐</div><div class="text">还没有打卡记录</div><div class="hint">点击上方按钮开始打卡吧</div></div>';
         }
 
         function showToast(msg) {
