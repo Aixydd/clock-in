@@ -114,6 +114,13 @@
             min-height: 0;
             overflow-y: auto;
             padding: 24px 24px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        #historyList {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         .records-head {
             display: flex;
@@ -191,22 +198,30 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            padding: 36px 0 28px;
+            justify-content: center;
+            gap: 14px;
+            height: 100%;
+            min-height: 160px;
+            padding: 20px 0;
         }
         .empty .art {
-            width: 64px;
-            height: 64px;
+            width: 88px;
+            height: 88px;
             border-radius: 50%;
             background: #FAF6EE;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 44px;
         }
         .empty .text {
-            color: #C0B6A6;
-            font-size: 15px;
+            color: #9A9080;
+            font-size: 17px;
+            font-weight: 500;
+        }
+        .empty .hint {
+            color: #C8BEAE;
+            font-size: 14px;
         }
 
         .toast {
@@ -261,6 +276,7 @@
                 <div class="empty">
                     <div class="art">🕐</div>
                     <div class="text">还没有打卡记录</div>
+                    <div class="hint">点击上方按钮开始打卡吧</div>
                 </div>
             </div>
         </div>
@@ -347,7 +363,7 @@
             const cnt = document.getElementById('recordCount');
             cnt.textContent = dates.length ? `${dates.length} 天` : '';
             if (!dates.length) {
-                el.innerHTML = '<div class="empty"><div class="art">🕐</div><div class="text">还没有打卡记录</div></div>';
+                el.innerHTML = '<div class="empty"><div class="art">🕐</div><div class="text">还没有打卡记录</div><div class="hint">点击上方按钮开始打卡吧</div></div>';
                 return;
             }
             let h = '';
