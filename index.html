@@ -526,7 +526,7 @@
             const sessions = toSessions(rec);
             
             if (isHoliday) {
-                return 'character_rest_holiday.png';  // 放假
+                return 'rest_cut.png';  // 放假，用纯人物（无文字）
             }
             
             if (sessions.length === 0) {
@@ -537,11 +537,11 @@
             const hasOpen = sessions.some(s => s.start && !s.end);
             
             if (completed) {
-                return 'character_work_end.png';  // 全部完成，"人，上班辛苦了"
+                return 'work_cut.png';  // 全部完成，用纯人物（无文字）
             } else if (hasOpen) {
-                return 'character_work_start.png';  // 工作中，"人，又上班了"
+                return 'work_cut.png';  // 工作中，用纯人物（无文字）
             } else {
-                return 'character_work_start.png';  // 部分完成，用工作形象
+                return 'work_cut.png';  // 部分完成，用工作形象
             }
         }
 
