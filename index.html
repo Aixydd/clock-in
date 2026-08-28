@@ -152,13 +152,15 @@
             flex: 1;
             min-height: 0;
             overflow-y: auto;
-            padding: calc(min(28vw, 180px) - 18px) 22px 16px;
+            padding: 22px 22px 16px;
             display: flex;
             flex-direction: column;
         }
-        .records .mascot {
-            top: -28px;
+        .time-card .mascot-bottom {
+            top: auto;
+            bottom: -12px;
             right: 14px;
+            left: auto;
         }
         .mascot-center {
             position: absolute;
@@ -334,6 +336,7 @@
                 <path d="M0 136 Q100 130 200 135 T400 134 L400 140 L0 140 Z" fill="#8FB182"/>
             </svg>
             <img class="mascot" src="gif1.gif" alt="角色">
+            <img class="mascot mascot-bottom" src="gif2.gif" alt="角色">
             <div class="date-line" id="currentDate"></div>
             <div class="clock-time" id="currentTime">--:--</div>
             <div class="status-pill" id="statusLabel">等待打卡</div>
@@ -353,7 +356,6 @@
 
         <!-- 底部：记录 -->
         <div class="records">
-            <img class="mascot" src="gif2.gif" alt="角色">
             <img class="mascot-center" src="character_cut.png" alt="角色">
             <div class="records-head">
                 <h3>最近记录</h3>
