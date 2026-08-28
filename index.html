@@ -193,9 +193,18 @@
             left: 50%;
             top: 58%;
             transform: translate(-50%, -50%);
-            width: min(40vw, 220px);
+            font-size: min(5vw, 28px);
+            font-weight: 600;
+            color: #FFFFFF;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
             pointer-events: none;
-            z-index: 2;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .mascot-text.show {
+            opacity: 1;
         }
         .records-head, #todayContent, #durationBox, #historyList {
             position: relative;
@@ -383,6 +392,7 @@
         <!-- 底部：记录 -->
         <div class="records">
             <img class="mascot-center" src="character_body.png" alt="角色" onclick="toggleHoliday()">
+            <div class="mascot-text" id="mascotText"></div>
             <div class="records-head">
                 <h3>最近记录</h3>
                 <span class="count" id="recordCount"></span>
@@ -423,6 +433,45 @@
         }
 
         const MAX_SESSIONS = 3; // 每天 3 组上下班
+
+        let lastState = null;
+        let firstLoad = true;
+
+        function getState() {
+            const rec = getTodayRecord();
+            const isHoliday = rec && rec.holiday;
+            const sessions = toSessions(rec);
+            
+            if (isHoliday) return 'holiday';
+            if (sessions.length === 0) return 'idle';
+            
+            const completed = sessions.length >= MAX_SESSIONS && sessions.every(s => s.start && s.end);
+            const hasOpen = sessions.some(s => s.start && !s.end);
+            
+            if (completed) return 'completed';
+            if (hasOpen) return 'working';
+            return 'working';
+        }
+
+        function getMascotText(state) {
+            const texts = {
+                'holiday': '人，放假啦',
+                'working': '人，又上班了',
+                'completed': '人，上班辛苦了',
+                'idle': ''
+            };
+            return texts[state] || '';
+        }
+
+        function showMascotText(text) {
+            const el = document.getElementById('mascotText');
+            el.textContent = text;
+            el.classList.add('show');
+            
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, 5000);
+        }
 
         function clockIn() {
             const records = getRecords(), today = getToday();
@@ -509,6 +558,17 @@
             const mascot = document.querySelector('.mascot-center');
             mascot.src = getCharacterImage();
             mascot.classList.toggle('on-holiday', isHoliday);
+            
+            // 检测状态变化，显示文字 5 秒
+            const currentState = getState();
+            if (!firstLoad && currentState !== lastState) {
+                const text = getMascotText(currentState);
+                if (text) {
+                    showMascotText(text);
+                }
+            }
+            lastState = currentState;
+            firstLoad = false;
 
             if (isHoliday) {
                 content.innerHTML = '<div class="holiday-info">🏖 今天放假，不记录打卡</div>';
