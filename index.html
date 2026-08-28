@@ -31,7 +31,7 @@
         /* ========== 顶部三分之一：时间 ========== */
         .time-card {
             position: relative;
-            background: linear-gradient(165deg, #FFFFFF 0%, #FDF8EF 60%, #FAF2E3 100%);
+            background: linear-gradient(180deg, #FFFFFF 0%, #FDF8EF 45%, #E4EDDF 100%);
             border-radius: 28px;
             box-shadow: 0 6px 24px rgba(120,100,70,0.08);
             height: 33vh;
@@ -42,6 +42,20 @@
             justify-content: center;
             padding: 24px 20px;
             border: 1px solid #F0E8D8;
+            overflow: hidden;
+        }
+        .forest {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 42%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .date-line, .clock-time, .status-pill {
+            position: relative;
+            z-index: 1;
         }
         .mascot {
             position: absolute;
@@ -278,6 +292,34 @@
     <div class="container">
         <!-- 顶部三分之一：时间 -->
         <div class="time-card">
+            <svg class="forest" viewBox="0 0 400 140" preserveAspectRatio="xMidYMax slice">
+                <!-- 远景树（浅绿） -->
+                <g fill="#D5E3CD" opacity="0.85">
+                    <path d="M18 140 L44 62 L70 140 Z"/>
+                    <path d="M330 140 L356 55 L382 140 Z"/>
+                    <circle cx="118" cy="108" r="20"/>
+                    <circle cx="118" cy="92" r="16"/>
+                    <rect x="115" y="118" width="6" height="22" fill="#C9B58F"/>
+                </g>
+                <!-- 中景树（中绿） -->
+                <g fill="#B7CFA9">
+                    <path d="M80 140 L108 35 L136 140 Z"/>
+                    <path d="M268 140 L298 48 L328 140 Z"/>
+                    <path d="M190 140 L214 80 L238 140 Z"/>
+                </g>
+                <!-- 近景树（深绿） -->
+                <g fill="#93B489">
+                    <path d="M140 140 L170 18 L200 140 Z"/>
+                    <path d="M52 140 L76 72 L100 140 Z"/>
+                    <path d="M310 140 L336 68 L362 140 Z"/>
+                    <circle cx="240" cy="100" r="24"/>
+                    <circle cx="240" cy="80" r="19"/>
+                    <rect x="236" y="112" width="8" height="28" fill="#A98F6B"/>
+                </g>
+                <!-- 地面 -->
+                <path d="M0 128 Q60 118 130 126 T270 124 T400 126 L400 140 L0 140 Z" fill="#A9C49C"/>
+                <path d="M0 136 Q100 130 200 135 T400 134 L400 140 L0 140 Z" fill="#8FB182"/>
+            </svg>
             <img class="mascot" src="gif1.gif" alt="角色">
             <div class="date-line" id="currentDate"></div>
             <div class="clock-time" id="currentTime">--:--</div>
