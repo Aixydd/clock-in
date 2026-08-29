@@ -93,9 +93,11 @@
             width: 100%; min-width: 0;
             position: fixed;
             inset: 0;
+            /* JS 会把 window.innerHeight 写进 --vh，这里做兜底 */
+            height: calc(var(--vh, 1vh) * 100);
             display: flex; flex-direction: column;
             gap: 8px;
-            padding: calc(8px + env(safe-area-inset-top)) 12px calc(8px + env(safe-area-inset-bottom));
+            padding: calc(6px + env(safe-area-inset-top)) 12px calc(6px + env(safe-area-inset-bottom));
             background: var(--bg);
         }
 
@@ -126,21 +128,21 @@
         .holiday-toggle.on .dot { background: var(--blue); }
         .holiday-toggle:active { transform: scale(0.94); }
 
-        /* 两页通用：flex 百分比布局，固定三块高度比例，彻底解决“内容少就留白” */
+        /* 两页通用：flex 兜底；JS 会在可用空间里按百分比精确分配像素高度 */
         .page {
             flex: 1; min-height: 0;
             display: flex; flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             overflow: hidden;
         }
         .page[hidden] { display: none; }
-        /* 打卡页：时间卡 40% / 按钮 13% / 记录区 47% */
-        #pageClock > .time-card { flex: 0 0 40%; min-height: 190px; }
-        #pageClock > .buttons { flex: 0 0 13%; min-height: 64px; }
+        /* 打卡页：时间卡 42% / 按钮 14% / 记录区 44% */
+        #pageClock > .time-card { flex: 0 0 42%; min-height: 0; }
+        #pageClock > .buttons { flex: 0 0 14%; min-height: 0; }
         #pageClock > .records { flex: 1; min-height: 0; }
-        /* 日历页：日历卡 60% / 图例 6% / 详情 34% */
-        #pageCalendar > .cal-card { flex: 0 0 60%; min-height: 0; }
-        #pageCalendar > .cal-legend { flex: 0 0 6%; min-height: 24px; }
+        /* 日历页：日历卡 64% / 图例 5% / 详情 31%（JS 会按选中状态微调） */
+        #pageCalendar > .cal-card { flex: 0 0 64%; min-height: 0; }
+        #pageCalendar > .cal-legend { flex: 0 0 5%; min-height: 0; }
         #pageCalendar > .cal-detail { flex: 1; min-height: 0; }
 
         /* 时间卡 */
@@ -983,6 +985,8 @@
             document.getElementById('tabClock').classList.toggle('on', !isCal);
             document.getElementById('tabCal').classList.toggle('on', isCal);
             if (isCal) renderCalendar();
+            // 切换页面后重算高度，否则 hidden 的 page 拿不到 clientHeight
+            requestAnimationFrame(function () { layout(); });
         }
 
         /* ===== 日历 ===== */
@@ -1047,6 +1051,7 @@
                 '本月出勤 ' + cnt.work + ' 天 · 放假 ' + cnt.holiday + ' 天 · 休息 ' + cnt.rest + ' 天';
 
             renderDetail(selectedKey, cnt);
+            layout(); // 渲染完日历/详情后重算高度
         }
         function renderDetail(key, cnt) {
             var box = document.getElementById('calDetail');
@@ -1187,6 +1192,55 @@
         }
 
         /* 输入法弹起时把底部弹层顶上去，避免输入框被键盘遮住（小米/安卓必备） */
+        /* ===== 精确撑满布局：用 JS 按真实 window.innerHeight 分配每块高度 ===== */
+        function layout() {
+            // 浏览器壳（如小米浏览器标签页）的 100vh/100dvh 常把工具栏算进去，
+            // 导致 flex/grid 百分比失效。这里用 window.innerHeight 作为唯一真相。
+            var h = window.innerHeight;
+            document.documentElement.style.setProperty('--vh', (h * 0.01) + 'px');
+
+            var page = document.querySelector('.page:not([hidden])');
+            if (!page) return;
+            var gap = 8;
+            var ph = page.clientHeight;
+            if (ph < 200) return; // 还未渲染好，跳过
+
+            if (page.id === 'pageClock') {
+                var tc = page.querySelector('.time-card');
+                var btns = page.querySelector('.buttons');
+                var rec = page.querySelector('.records');
+                if (!tc || !btns || !rec) return;
+                var tcH = Math.round(ph * 0.42);
+                var btnH = Math.round(ph * 0.14);
+                var recH = Math.max(120, ph - tcH - btnH - gap * 2);
+                tc.style.height = tcH + 'px';
+                btns.style.height = btnH + 'px';
+                rec.style.height = recH + 'px';
+            } else if (page.id === 'pageCalendar') {
+                var cal = page.querySelector('.cal-card');
+                var leg = page.querySelector('.cal-legend');
+                var det = page.querySelector('.cal-detail');
+                if (!cal || !leg || !det) return;
+                if (selectedKey) {
+                    var calH = Math.round(ph * 0.64);
+                    var legH = Math.round(ph * 0.05);
+                    var detH = Math.max(90, ph - calH - legH - gap * 2);
+                    cal.style.height = calH + 'px';
+                    leg.style.height = legH + 'px';
+                    det.style.height = detH + 'px';
+                } else {
+                    // 未选日期：日历卡更大，详情只保留提示行
+                    var calH2 = Math.round(ph * 0.78);
+                    var legH2 = Math.round(ph * 0.05);
+                    cal.style.height = calH2 + 'px';
+                    leg.style.height = legH2 + 'px';
+                    det.style.height = 'auto';
+                }
+            }
+        }
+        window.addEventListener('resize', layout);
+        window.addEventListener('orientationchange', function () { setTimeout(layout, 120); });
+
         function setupKeyboardInset() {
             var vv = window.visualViewport;
             if (!vv) return;
@@ -1211,6 +1265,8 @@
         var t0 = parseKey(getToday());
         calYear = t0.y; calMonth = t0.m;
         updateUI();
+        // 等一帧再算高度，确保 DOM 尺寸稳定
+        requestAnimationFrame(function () { layout(); });
         setupServiceWorker();
         if (migratedDays > 0 && window.console) {
             console.log('[打卡] 已修正 ' + migratedDays + ' 天的日期归属，原始数据备份在 localStorage.clockRecordsBackup');
