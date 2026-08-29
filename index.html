@@ -450,13 +450,14 @@
             
             if (completed) return 'completed';
             if (hasOpen) return 'working';
-            return 'working';
+            return 'rest';  // 两次打卡之间的休息状态
         }
 
         function getMascotText(state) {
             const texts = {
                 'holiday': '人，放假啦',
                 'working': '人，又上班了',
+                'rest': '人，上班辛苦了',
                 'completed': '人，上班辛苦了',
                 'idle': ''
             };
@@ -526,22 +527,22 @@
             const sessions = toSessions(rec);
             
             if (isHoliday) {
-                return 'rest_cut.png';  // 放假，用躺枕头的放假形象
+                return 'character_body.png';  // 放假，用最初的糯糯形象（放假形象）
             }
             
             if (sessions.length === 0) {
-                return 'character_body.png';  // 未打卡，用默认形象
+                return 'character_body.png';  // 未打卡，用放假形象（默认）
             }
             
             const completed = sessions.length >= MAX_SESSIONS && sessions.every(s => s.start && s.end);
             const hasOpen = sessions.some(s => s.start && !s.end);
             
             if (completed) {
-                return 'work_cut.png';  // 全部完成，用书桌前的上班形象
+                return 'rest_cut.png';  // 全部完成，用躺枕头的下班形象（下班形象）
             } else if (hasOpen) {
-                return 'work_cut.png';  // 工作中，用纯人物（无文字）
+                return 'work_cut.png';  // 工作中，用书桌前的上班形象（上班形象）
             } else {
-                return 'work_cut.png';  // 部分完成，用工作形象
+                return 'rest_cut.png';  // 两组之间的下班休息，用躺枕头形象（下班形象）
             }
         }
 
