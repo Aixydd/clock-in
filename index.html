@@ -84,11 +84,12 @@
         }
 
         .container {
-            width: 100%; max-width: 460px; margin: 0 auto;
+            /* 全宽撑满，左右仅留窄 padding；不再夹 460px，否则部分 WebView 桌面缩放下会留大空白 */
+            width: 100%; min-width: 0;
             min-height: 100dvh; height: 100dvh;
             display: grid; grid-template-rows: auto 1fr auto;
             row-gap: clamp(8px, 1.5vh, 14px);
-            padding: calc(12px + env(safe-area-inset-top)) clamp(12px, 3.6vw, 16px) calc(12px + env(safe-area-inset-bottom));
+            padding: calc(10px + env(safe-area-inset-top)) 14px calc(10px + env(safe-area-inset-bottom));
             background: var(--bg);
         }
 
@@ -342,10 +343,9 @@
         .sheet-mask.show { opacity: 1; pointer-events: auto; }
         .sheet {
             position: fixed; left: 0; right: 0; bottom: var(--kbd);
-            max-width: 460px; margin: 0 auto;
             background: var(--card);
             border-radius: 24px 24px 0 0;
-            padding: 14px 20px calc(20px + env(safe-area-inset-bottom));
+            padding: 14px 16px calc(20px + env(safe-area-inset-bottom));
             max-height: 86vh; max-height: 86dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
             transform: translateY(105%); transition: transform .28s cubic-bezier(.32, .72, 0, 1), bottom .18s ease-out;
             z-index: 100; display: flex; flex-direction: column; gap: 12px;
@@ -418,7 +418,6 @@
         }
         /* 横屏 / 分屏：grid 改双列，避免时间卡独占整屏 */
         @media (orientation: landscape) and (max-height: 620px) {
-            .container { max-width: 720px; row-gap: 10px; }
             #pageClock { grid-template-columns: 1fr 1.3fr; grid-template-rows: 1fr; column-gap: 10px; }
             #pageClock > .time-card { grid-column: 1; grid-row: 1; min-height: 0; }
             #pageClock > .buttons { grid-column: 2; grid-row: 1 / span 2; align-self: start; }
