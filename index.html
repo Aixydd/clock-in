@@ -526,7 +526,7 @@
             const sessions = toSessions(rec);
             
             if (isHoliday) {
-                return 'work_cut.png';  // 放假（与下班形象对换）
+                return 'rest_cut.png';  // 放假，用躺枕头的放假形象
             }
             
             if (sessions.length === 0) {
@@ -537,7 +537,7 @@
             const hasOpen = sessions.some(s => s.start && !s.end);
             
             if (completed) {
-                return 'rest_cut.png';  // 全部完成，用休息形象（与放假对换）
+                return 'work_cut.png';  // 全部完成，用书桌前的上班形象
             } else if (hasOpen) {
                 return 'work_cut.png';  // 工作中，用纯人物（无文字）
             } else {
