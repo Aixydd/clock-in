@@ -38,9 +38,9 @@
             --r-pill: 999px;
 
             /* 自适应尺寸基准：随视口高度/宽度伸缩，避免固定 px 在瘦高屏上头重脚轻 */
-            --avatar: clamp(56px, 9vh, 80px);
-            --pad-t: clamp(12px, 2.1vh, 20px);
-            --pad-b: clamp(13px, 2.3vh, 22px);
+            --avatar: clamp(68px, 10.5vh, 100px);
+            --pad-t: clamp(14px, 2.4vh, 24px);
+            --pad-b: clamp(16px, 2.6vh, 26px);
             --kbd: 0px;
         }
 
@@ -71,11 +71,17 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+            overscroll-behavior: none;
+            background: var(--bg);
+        }
         @supports (height: 100dvh) { html, body { height: 100dvh; } }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: var(--bg);
             color: var(--ink);
             -webkit-font-smoothing: antialiased;
             -webkit-text-size-adjust: 100%;
@@ -84,49 +90,58 @@
         }
 
         .container {
-            /* 全宽撑满，左右仅留窄 padding；不再夹 460px，否则部分 WebView 桌面缩放下会留大空白 */
             width: 100%; min-width: 0;
-            min-height: 100dvh; height: 100dvh;
-            display: grid; grid-template-rows: auto 1fr auto;
-            row-gap: clamp(8px, 1.5vh, 14px);
-            padding: calc(10px + env(safe-area-inset-top)) 14px calc(10px + env(safe-area-inset-bottom));
+            position: fixed;
+            inset: 0;
+            display: flex; flex-direction: column;
+            gap: 8px;
+            padding: calc(8px + env(safe-area-inset-top)) 12px calc(8px + env(safe-area-inset-bottom));
             background: var(--bg);
         }
 
-        .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; gap: 8px; min-height: 32px; }
-        .appname { font-size: clamp(13px, 3.5vw, 15px); font-weight: 600; color: var(--ink2); letter-spacing: 1px; white-space: nowrap; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; gap: 8px; min-height: 36px; }
+        .appname { font-size: clamp(17px, 5vw, 21px); font-weight: 700; color: var(--ink); letter-spacing: 1px; white-space: nowrap; }
         .icon-btn {
-            width: clamp(30px, 8.2vw, 34px); height: clamp(30px, 8.2vw, 34px); flex-shrink: 0;
+            width: clamp(38px, 10vw, 44px); height: clamp(38px, 10vw, 44px); flex-shrink: 0;
             border: none; border-radius: var(--r-pill);
             background: var(--card); color: var(--ink2);
             display: flex; align-items: center; justify-content: center; cursor: pointer;
             transition: transform .15s;
         }
-        .icon-btn svg { width: 17px; height: 17px; }
+        .icon-btn svg { width: 20px; height: 20px; }
         .icon-btn:active { transform: scale(0.92); }
-        .top-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
+        .top-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
         .holiday-toggle {
             display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
-            padding: 6px 10px; border: none; border-radius: var(--r-pill);
+            padding: 7px 12px; border: none; border-radius: var(--r-pill);
             background: var(--card); color: var(--muted);
-            font-size: clamp(11px, 3.1vw, 13px); font-weight: 600; cursor: pointer;
+            font-size: clamp(12px, 3.4vw, 14px); font-weight: 600; cursor: pointer;
             transition: background .18s, color .18s, transform .15s;
         }
         .holiday-toggle .dot {
-            width: 7px; height: 7px; border-radius: 50%;
+            width: 8px; height: 8px; border-radius: 50%;
             background: var(--faint); transition: background .2s;
         }
         .holiday-toggle.on { background: var(--blue-bg); color: var(--blue); }
         .holiday-toggle.on .dot { background: var(--blue); }
         .holiday-toggle:active { transform: scale(0.94); }
 
-        /* 两页通用：grid 布局，子项比例固定，不依赖 flex: 1 在某些 WebView 上的兼容问题 */
-        .page { min-height: 0; display: grid; row-gap: 12px; }
+        /* 两页通用：flex 百分比布局，固定三块高度比例，彻底解决“内容少就留白” */
+        .page {
+            flex: 1; min-height: 0;
+            display: flex; flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
         .page[hidden] { display: none; }
-        /* 打卡页：时间卡 / 按钮 / 记录 三行；记录行撑满剩余空间 */
-        #pageClock { grid-template-rows: auto auto minmax(0, 1fr); }
-        /* 日历页：日历卡 / 图例 / 详情 三行；详情行撑满剩余空间（未展开时也只占 1 行短提示） */
-        #pageCalendar { grid-template-rows: auto auto minmax(0, 1fr); }
+        /* 打卡页：时间卡 40% / 按钮 13% / 记录区 47% */
+        #pageClock > .time-card { flex: 0 0 40%; min-height: 190px; }
+        #pageClock > .buttons { flex: 0 0 13%; min-height: 64px; }
+        #pageClock > .records { flex: 1; min-height: 0; }
+        /* 日历页：日历卡 60% / 图例 6% / 详情 34% */
+        #pageCalendar > .cal-card { flex: 0 0 60%; min-height: 0; }
+        #pageCalendar > .cal-legend { flex: 0 0 6%; min-height: 24px; }
+        #pageCalendar > .cal-detail { flex: 1; min-height: 0; }
 
         /* 时间卡 */
         .time-card {
@@ -144,7 +159,7 @@
             border: 3px solid var(--card);
             box-shadow: 0 5px 14px rgba(120, 100, 70, 0.15);
             background: var(--card3);
-            margin-bottom: clamp(6px, 1.4vh, 12px);
+            margin-bottom: clamp(8px, 1.6vh, 14px);
             position: relative; z-index: 1;
             transition: box-shadow .3s;
         }
@@ -154,23 +169,23 @@
             left: 50%; top: calc(var(--pad-t) + var(--avatar));
             transform: translateX(-50%) translateY(-6px);
             background: var(--card3); color: var(--ink2);
-            font-size: 12px; font-weight: 600; letter-spacing: .5px;
-            padding: 6px 11px; border-radius: 12px;
+            font-size: 13px; font-weight: 600; letter-spacing: .5px;
+            padding: 7px 12px; border-radius: 14px;
             opacity: 0; pointer-events: none; z-index: 3;
             white-space: nowrap; max-width: 90%; overflow: hidden; text-overflow: ellipsis;
             transition: opacity .3s, transform .3s;
         }
         .speech.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .date-line { font-size: clamp(13px, 3.9vw, 16px); color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; font-weight: 500; }
+        .date-line { font-size: clamp(15px, 4.5vw, 19px); color: var(--muted); letter-spacing: 1px; margin-bottom: 5px; font-weight: 500; }
         .clock-time {
-            font-size: clamp(44px, 17.5vw, 80px); font-weight: 700;
-            font-variant-numeric: tabular-nums; letter-spacing: 1px; color: var(--ink); line-height: 1.08;
+            font-size: clamp(50px, 19vw, 92px); font-weight: 700;
+            font-variant-numeric: tabular-nums; letter-spacing: 1px; color: var(--ink); line-height: 1.05;
         }
         .status-pill {
-            display: inline-flex; align-items: center; gap: 5px; margin-top: clamp(7px, 1.6vh, 13px);
-            padding: 6px 14px; border-radius: var(--r-pill);
+            display: inline-flex; align-items: center; gap: 6px; margin-top: clamp(8px, 1.8vh, 15px);
+            padding: 7px 17px; border-radius: var(--r-pill);
             background: var(--card3); color: var(--muted);
-            font-size: clamp(14px, 4vw, 16px); letter-spacing: 1px; font-weight: 600;
+            font-size: clamp(15px, 4.4vw, 18px); letter-spacing: 1px; font-weight: 600;
         }
         .status-pill.working { background: var(--green-bg); color: var(--green-ink); }
         .status-pill.done { background: var(--brown-bg); color: var(--brown-ink); }
@@ -178,100 +193,106 @@
         .holiday-info { text-align: center; font-size: 18px; color: var(--muted); letter-spacing: 1px; padding: 16px 0; }
 
         /* 按钮 */
-        .buttons { display: flex; gap: clamp(8px, 2.6vw, 12px); }
+        .buttons { display: flex; gap: clamp(10px, 3vw, 14px); }
         .btn {
-            flex: 1; min-width: 0; padding: clamp(11px, 2vh, 18px) 12px; border: none; border-radius: var(--r-card);
-            font-size: clamp(15px, 4.2vw, 17px); font-weight: 600; cursor: pointer;
+            flex: 1; min-width: 0; padding: clamp(14px, 2.6vh, 24px) 12px; border: none; border-radius: var(--r-card);
+            font-size: clamp(17px, 5vw, 21px); font-weight: 600; cursor: pointer;
             transition: transform .15s, filter .15s, opacity .15s;
             letter-spacing: 1px; display: flex; flex-direction: column;
-            align-items: center; gap: 5px; color: #FFFFFF;
+            align-items: center; gap: 6px; color: #FFFFFF;
         }
-        .btn svg { width: clamp(20px, 5.8vw, 24px); height: clamp(20px, 5.8vw, 24px); }
+        .btn svg { width: clamp(24px, 7vw, 30px); height: clamp(24px, 7vw, 30px); }
         .btn span { white-space: nowrap; }
         .btn:active { transform: scale(0.96); filter: brightness(0.94); }
         .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: none; }
         .btn-start { background: var(--green); }
         .btn-end { background: var(--brown); }
 
-        /* 记录：在 grid 里占 1fr 行，撑满到底部 tabbar */
+        /* 记录：固定占页面的 47%，内部再分 “标题”+“内容体” */
         .records {
             position: relative; background: var(--card); border-radius: var(--r-card);
             box-shadow: var(--shadow); border: 1px solid var(--line);
-            min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+            min-height: 0; overflow: hidden;
             padding: clamp(12px, 2vh, 18px) clamp(12px, 3.6vw, 16px) clamp(10px, 1.8vh, 16px);
             display: flex; flex-direction: column; transition: background .3s, border-color .3s;
         }
-        .records::-webkit-scrollbar { display: none; }
-        .records-head, #todayContent, #durationBox, #historyList, .undo-btn { position: relative; z-index: 1; }
-        .records-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-shrink: 0; }
-        .records-head h3 { font-size: 18px; font-weight: 600; color: var(--ink2); letter-spacing: 2px; }
-        .records-head .count { font-size: 13px; color: var(--faint); }
-        #historyList { flex: 1; display: flex; flex-direction: column; }
+        .records-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-shrink: 0; }
+        .records-head h3 { font-size: 20px; font-weight: 700; color: var(--ink2); letter-spacing: 2px; }
+        .records-head .count { font-size: 14px; color: var(--faint); }
+        .records-body {
+            flex: 1; min-height: 0;
+            display: flex; flex-direction: column;
+            overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .records-body::-webkit-scrollbar { display: none; }
+
         .record-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 2px; border-bottom: 1px solid var(--line);
+            padding: 12px 2px; border-bottom: 1px solid var(--line);
         }
-        .record-label { font-size: 16px; color: var(--ink2); display: flex; align-items: center; gap: 9px; }
-        .record-label .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .record-label { font-size: 18px; color: var(--ink2); display: flex; align-items: center; gap: 10px; }
+        .record-label .dot { width: 9px; height: 9px; border-radius: 50%; }
         .record-label .dot.start { background: var(--green); }
         .record-label .dot.end { background: var(--brown); }
-        .record-value { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+        .record-value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
         .duration {
-            margin: 10px 0 4px; padding: 12px; background: var(--card2);
-            border-radius: var(--r-ctl); text-align: center; font-size: 14px;
+            margin: 10px 0 4px; padding: 14px; background: var(--card2);
+            border-radius: var(--r-ctl); text-align: center; font-size: 15px;
             color: var(--muted); flex-shrink: 0;
         }
-        .duration strong { color: var(--green-ink); font-size: 18px; font-weight: 700; }
-        .history-item { padding: 10px 2px; border-bottom: 1px solid var(--line); }
+        .duration strong { color: var(--green-ink); font-size: 22px; font-weight: 700; }
+        .history-item { padding: 11px 2px; border-bottom: 1px solid var(--line); }
         .history-item:last-child { border-bottom: none; }
-        .history-date { font-size: 13px; color: var(--faint); margin-bottom: 3px; }
-        .history-times { display: flex; gap: 16px; font-size: 15px; color: var(--ink2); }
+        .history-date { font-size: 14px; color: var(--faint); margin-bottom: 4px; }
+        .history-times { display: flex; gap: 16px; font-size: 16px; color: var(--ink2); }
         .empty {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 8px; flex: 1; min-height: 90px; padding: 14px 0;
+            gap: 10px; flex: 1; min-height: 120px; padding: 18px 0;
         }
         .empty .art {
-            width: 64px; height: 64px; border-radius: 50%; background: var(--card2);
+            width: 80px; height: 80px; border-radius: 50%; background: var(--card2);
             display: flex; align-items: center; justify-content: center;
         }
-        .empty .text { color: var(--muted); font-size: 15px; font-weight: 500; }
-        .empty .hint { color: var(--faint); font-size: 13px; }
+        .empty .art svg { width: 40px; height: 40px; color: var(--muted); }
+        .empty .text { color: var(--muted); font-size: 17px; font-weight: 600; }
+        .empty .hint { color: var(--faint); font-size: 14px; }
         .undo-btn {
-            width: 100%; padding: 12px; border: 1px solid var(--line2);
+            width: 100%; padding: 14px; border: 1px solid var(--line2);
             border-radius: var(--r-ctl); background: var(--card); color: var(--muted);
-            font-size: 14px; font-weight: 600; letter-spacing: 1px; cursor: pointer;
+            font-size: 15px; font-weight: 600; letter-spacing: 1px; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 7px;
             flex-shrink: 0; transition: all .15s;
         }
-        .undo-btn svg { width: 16px; height: 16px; }
+        .undo-btn svg { width: 18px; height: 18px; }
         .undo-btn:active { transform: scale(0.97); background: var(--card2); }
         .undo-btn.armed { border-color: var(--warn-line); background: var(--warn-bg); color: var(--warn); }
 
         /* 日历 */
         .cal-card {
             background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow);
-            border: 1px solid var(--line); padding: 14px 12px 12px;
+            border: 1px solid var(--line); padding: 16px 14px 14px;
             transition: background .3s, border-color .3s;
+            display: flex; flex-direction: column; min-height: 0;
         }
-        .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .cal-title { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: 1px; }
-        .cal-navs { display: flex; gap: 6px; }
+        .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-shrink: 0; }
+        .cal-title { font-size: clamp(19px, 5.5vw, 23px); font-weight: 700; color: var(--ink); letter-spacing: 1px; }
+        .cal-navs { display: flex; gap: 8px; }
         .cal-nav {
-            width: 28px; height: 28px; border: none; border-radius: var(--r-pill);
+            width: clamp(32px, 8vw, 38px); height: clamp(32px, 8vw, 38px); border: none; border-radius: var(--r-pill);
             background: var(--card2); color: var(--ink2);
             display: flex; align-items: center; justify-content: center; cursor: pointer;
             transition: transform .15s;
         }
-        .cal-nav svg { width: 13px; height: 13px; }
+        .cal-nav svg { width: 16px; height: 16px; }
         .cal-nav:active { transform: scale(0.9); }
-        .cal-week { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 2px; }
-        .cal-week span { text-align: center; font-size: 11px; color: var(--faint); padding: 3px 0; font-weight: 500; }
+        .cal-week { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; flex-shrink: 0; }
+        .cal-week span { text-align: center; font-size: 13px; color: var(--faint); padding: 4px 0; font-weight: 600; }
         .cal-week span.we { color: var(--brown); }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         .cal-cell {
-            position: relative; aspect-ratio: 1 / 1; border-radius: 12px;
+            position: relative; border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 14px; font-variant-numeric: tabular-nums; color: var(--ink2);
+            font-size: clamp(15px, 4.6vw, 18px); font-variant-numeric: tabular-nums; color: var(--ink2);
             background: transparent; border: 1.5px solid transparent; cursor: pointer;
             transition: transform .12s, background .2s, border-color .2s;
             -webkit-tap-highlight-color: transparent;
@@ -279,56 +300,56 @@
         .cal-cell:active { transform: scale(0.9); }
         .cal-cell.empty { pointer-events: none; }
         .cal-cell.weekend { color: var(--brown); }
-        .cal-cell.work { background: var(--green-bg); color: var(--green-ink); font-weight: 600; }
+        .cal-cell.work { background: var(--green-bg); color: var(--green-ink); font-weight: 700; }
         .cal-cell.planned { border-color: var(--green); color: var(--green-ink); }
-        .cal-cell.holiday { background: var(--blue-bg); color: var(--blue); font-weight: 600; }
+        .cal-cell.holiday { background: var(--blue-bg); color: var(--blue); font-weight: 700; }
         .cal-cell.rest { background: var(--card3); color: var(--muted); }
         .cal-cell.today { border-color: var(--ink); font-weight: 700; }
         .cal-cell.selected { transform: scale(1.06); box-shadow: 0 0 0 2px var(--ink); }
         .cal-cell .note-dot {
-            position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-            width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: .65;
+            position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+            width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: .65;
         }
         .cal-summary {
             margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line);
-            font-size: 12px; color: var(--muted); text-align: center; letter-spacing: .5px;
+            font-size: 13px; color: var(--muted); text-align: center; letter-spacing: .5px;
+            flex-shrink: 0;
         }
-        .cal-legend { display: flex; justify-content: center; gap: 10px; padding: 2px 0 0; }
-        .cal-legend span { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
-        .cal-legend i { width: 9px; height: 9px; border-radius: 3px; display: block; }
+        .cal-legend { display: flex; justify-content: center; gap: 12px; padding: 4px 0 0; }
+        .cal-legend span { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); font-weight: 500; }
+        .cal-legend i { width: 10px; height: 10px; border-radius: 3px; display: block; }
         .cal-legend i.work { background: var(--green-bg); box-shadow: inset 0 0 0 1px var(--green); }
         .cal-legend i.planned { border: 1.5px solid var(--green); background: transparent; }
         .cal-legend i.holiday { background: var(--blue-bg); box-shadow: inset 0 0 0 1px var(--blue); }
         .cal-legend i.rest { background: var(--card3); box-shadow: inset 0 0 0 1px var(--line2); }
 
-        /* 日历详情：默认是一段短提示（~70px），选中日期后切换到完整面板撑满剩余空间 */
+        /* 日历详情：未选日期时显示本月概览，选中后显示当天详情 */
         .cal-detail {
             background: var(--card); border-radius: var(--r-card); box-shadow: var(--shadow);
-            border: 1px solid var(--line); padding: 12px 14px;
+            border: 1px solid var(--line); padding: 14px;
             display: flex; flex-direction: column; gap: 10px;
             transition: background .3s, border-color .3s;
             overflow-y: auto; min-height: 0;
         }
-        .cal-detail.is-empty { flex-direction: row; align-items: center; gap: 10px; padding: 14px; }
-        .cal-detail.is-empty .detail-title { font-size: 14px; font-weight: 600; }
-        .cal-detail.is-empty .detail-sub { display: none; }
+        .cal-detail.is-empty { gap: 14px; }
         .cal-detail .empty-art {
-            width: 36px; height: 36px; border-radius: 50%; background: var(--card2);
+            width: 48px; height: 48px; border-radius: 50%; background: var(--card2);
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
             color: var(--muted);
         }
-        .detail-title { font-size: 16px; font-weight: 700; color: var(--ink); }
-        .detail-sub { font-size: 12px; color: var(--muted); }
+        .cal-detail .empty-art svg { width: 24px; height: 24px; }
+        .detail-title { font-size: 18px; font-weight: 700; color: var(--ink); }
+        .detail-sub { font-size: 13px; color: var(--muted); }
         .detail-box {
-            background: var(--card2); border-radius: var(--r-ctl); padding: 10px 12px;
-            font-size: 14px; color: var(--ink2); line-height: 1.5;
+            background: var(--card2); border-radius: var(--r-ctl); padding: 12px 14px;
+            font-size: 15px; color: var(--ink2); line-height: 1.5;
         }
         .detail-box .row { display: flex; justify-content: space-between; }
-        .detail-box .row b { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
-        .detail-actions { display: flex; flex-direction: column; gap: 10px; }
+        .detail-box .row b { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+        .detail-actions { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
         .btn-primary, .btn-ghost {
-            width: 100%; padding: 13px; border-radius: var(--r-ctl);
-            font-size: 15px; font-weight: 600; border: none; cursor: pointer;
+            width: 100%; padding: 15px; border-radius: var(--r-ctl);
+            font-size: 16px; font-weight: 600; border: none; cursor: pointer;
             transition: transform .15s; letter-spacing: 1px;
         }
         .btn-primary { background: var(--green); color: #FFFFFF; }
@@ -352,13 +373,13 @@
         }
         .sheet > * { flex-shrink: 0; }
         .sheet.show { transform: translateY(0); }
-        .sheet-handle { width: 38px; height: 4px; border-radius: 2px; background: var(--line2); margin: 0 auto 2px; }
-        .sheet-title { font-size: 17px; font-weight: 700; color: var(--ink); text-align: center; }
+        .sheet-handle { width: 42px; height: 5px; border-radius: 3px; background: var(--line2); margin: 0 auto 4px; }
+        .sheet-title { font-size: 19px; font-weight: 700; color: var(--ink); text-align: center; }
         .seg { display: flex; gap: 4px; background: var(--card2); padding: 4px; border-radius: var(--r-ctl); }
         .seg button {
-            flex: 1; padding: 10px 0; border: none; border-radius: 12px;
+            flex: 1; padding: 12px 0; border: none; border-radius: 14px;
             background: transparent; color: var(--muted);
-            font-size: 14px; font-weight: 600; cursor: pointer; transition: all .18s;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: all .18s;
         }
         .seg button.on { background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0, 0, 0, .08); }
         .seg button.on[data-plan="holiday"] { color: var(--blue); }
@@ -382,50 +403,51 @@
             transition: background .3s, border-color .3s;
         }
         .tab {
-            flex: 1; height: clamp(40px, 6vh, 48px); border: none; border-radius: 16px;
+            flex: 1; height: clamp(48px, 7vh, 56px); border: none; border-radius: 18px;
             background: transparent; color: var(--muted);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 2px; font-size: clamp(10px, 3vw, 12px); font-weight: 600; cursor: pointer; transition: all .18s;
+            gap: 3px; font-size: clamp(12px, 3.6vw, 14px); font-weight: 600; cursor: pointer; transition: all .18s;
         }
-        .tab svg { width: clamp(17px, 4.9vw, 20px); height: clamp(17px, 4.9vw, 20px); }
+        .tab svg { width: clamp(22px, 6vw, 26px); height: clamp(22px, 6vw, 26px); }
         .tab.on { background: var(--green-bg); color: var(--green-ink); }
 
         .toast {
-            position: fixed; top: calc(56px + env(safe-area-inset-top)); left: 50%;
+            position: fixed; top: calc(60px + env(safe-area-inset-top)); left: 50%;
             transform: translateX(-50%) translateY(-12px);
             background: rgba(62, 57, 51, 0.94); color: #FFFFFF;
-            padding: 10px 18px; border-radius: var(--r-ctl);
-            font-size: 14px; font-weight: 500; opacity: 0;
+            padding: 11px 20px; border-radius: var(--r-ctl);
+            font-size: 15px; font-weight: 500; opacity: 0;
             transition: opacity .25s, transform .25s;
             pointer-events: none; z-index: 120; letter-spacing: 1px;
             max-width: 84vw; text-align: center;
         }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* ===== 分档适配：按屏幕高度自动收紧，避免瘦高屏头重脚轻、矮屏被截断 ===== */
         @media (max-height: 780px) {
-            :root { --avatar: clamp(50px, 8vh, 68px); }
-            .clock-time { font-size: clamp(40px, 15.5vw, 66px); }
+            :root { --avatar: clamp(56px, 9vh, 78px); }
+            .clock-time { font-size: clamp(44px, 17vw, 74px); }
+            .btn { font-size: clamp(16px, 4.8vw, 19px); }
         }
         @media (max-height: 660px) {
-            :root { --avatar: clamp(44px, 7vh, 60px); --pad-t: 10px; --pad-b: 12px; }
-            .container { row-gap: 8px; }
-            .clock-time { font-size: clamp(36px, 13vw, 58px); }
-            .btn { padding: 10px 12px; }
-            .empty { min-height: 56px; padding: 8px 0; }
-            .empty .art { width: 48px; height: 48px; }
-            .records-head h3 { font-size: 16px; }
+            :root { --avatar: clamp(48px, 8vh, 68px); --pad-t: 10px; --pad-b: 12px; }
+            .container { gap: 6px; padding: calc(6px + env(safe-area-inset-top)) 10px calc(6px + env(safe-area-inset-bottom)); }
+            .clock-time { font-size: clamp(40px, 15vw, 64px); }
+            .btn { padding: 10px 12px; font-size: clamp(15px, 4.5vw, 18px); }
+            .empty { min-height: 80px; padding: 8px 0; }
+            .empty .art { width: 64px; height: 64px; }
+            .records-head h3 { font-size: 18px; }
+            .tab { height: clamp(42px, 6vh, 50px); }
         }
-        /* 横屏 / 分屏：grid 改双列，避免时间卡独占整屏 */
+        /* 横屏 / 分屏：改为左右双列 */
         @media (orientation: landscape) and (max-height: 620px) {
-            #pageClock { grid-template-columns: 1fr 1.3fr; grid-template-rows: 1fr; column-gap: 10px; }
-            #pageClock > .time-card { grid-column: 1; grid-row: 1; min-height: 0; }
-            #pageClock > .buttons { grid-column: 2; grid-row: 1 / span 2; align-self: start; }
-            #pageClock > .records { grid-column: 2; grid-row: 2; }
-            #pageCalendar { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; column-gap: 10px; }
-            #pageCalendar > .cal-card { grid-column: 1; grid-row: 1; min-height: 0; overflow-y: auto; }
+            #pageClock { flex-direction: row; gap: 10px; }
+            #pageClock > .time-card { flex: 0 0 42%; min-width: 0; }
+            #pageClock > .buttons { flex: 0 0 14%; min-width: 0; flex-direction: column; }
+            #pageClock > .records { flex: 1; min-width: 0; }
+            #pageCalendar { flex-direction: row; gap: 10px; }
+            #pageCalendar > .cal-card { flex: 1; min-width: 0; }
             #pageCalendar > .cal-legend { display: none; }
-            #pageCalendar > .cal-detail { grid-column: 2; grid-row: 1; }
+            #pageCalendar > .cal-detail { flex: 0 0 38%; min-width: 0; }
         }
     </style>
 </head>
@@ -476,16 +498,18 @@
                     <h3>最近记录</h3>
                     <span class="count" id="recordCount"></span>
                 </div>
-                <div id="todayContent"></div>
-                <div class="duration" id="durationBox" style="display:none"></div>
-                <button class="undo-btn" id="btnUndo" onclick="requestUndo()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 9h9a5 5 0 0 1 0 10H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M8 5L4 9l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span id="undoText">撤销上一次打卡</span>
-                </button>
-                <div id="historyList"></div>
+                <div class="records-body">
+                    <div id="todayContent"></div>
+                    <div class="duration" id="durationBox" style="display:none"></div>
+                    <button class="undo-btn" id="btnUndo" onclick="requestUndo()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 9h9a5 5 0 0 1 0 10H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M8 5L4 9l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span id="undoText">撤销上一次打卡</span>
+                    </button>
+                    <div id="historyList"></div>
+                </div>
             </div>
         </div>
 
@@ -926,7 +950,7 @@
             var dates = Object.keys(records).sort().reverse().slice(0, 7);
             var el = document.getElementById('historyList');
             var cnt = document.getElementById('recordCount');
-            var emptyHtml = '<div class="empty"><div class="art"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C8BEAE" stroke-width="2"/><path d="M12 7v5.2l3.2 2" stroke="#C8BEAE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="text">还没有打卡记录</div><div class="hint">点击上方按钮开始打卡吧</div></div>';
+            var emptyHtml = '<div class="empty"><div class="art"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5.2l3.2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="text">还没有打卡记录</div><div class="hint">点击上方按钮开始打卡吧</div></div>';
             cnt.textContent = dates.length ? dates.length + ' 天' : '';
             if (!dates.length) { el.innerHTML = emptyHtml; return; }
             var h = '';
@@ -1022,25 +1046,31 @@
             document.getElementById('calSummary').textContent =
                 '本月出勤 ' + cnt.work + ' 天 · 放假 ' + cnt.holiday + ' 天 · 休息 ' + cnt.rest + ' 天';
 
-            // 未选日期时让第三行也跟着 hug content，不抢屏幕下方空间
-            var page = document.getElementById('pageCalendar');
-            page.style.gridTemplateRows = selectedKey
-                ? 'auto auto minmax(0, 1fr)'
-                : 'auto auto auto';
-
-            renderDetail(selectedKey);
+            renderDetail(selectedKey, cnt);
         }
-        function renderDetail(key) {
+        function renderDetail(key, cnt) {
             var box = document.getElementById('calDetail');
+            var calIcon = '<div class="empty-art"><svg width="24" height="24" viewBox="0 0 24 24" fill="none">' +
+                '<rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" stroke-width="2"/>' +
+                '<path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
+                '</svg></div>';
             if (!key) {
-                // 未选日期：单行短提示，不撑满下方空间
+                // 未选日期：显示本月概览卡片，占满详情区
                 box.className = 'cal-detail is-empty';
                 box.innerHTML =
-                    '<div class="empty-art"><svg width="18" height="18" viewBox="0 0 24 24" fill="none">' +
-                    '<rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" stroke-width="2"/>' +
-                    '<path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
-                    '</svg></div>' +
-                    '<div class="detail-title">点上面的日期安排一下</div>';
+                    calIcon +
+                    '<div>' +
+                    '<div class="detail-title">点选日期查看或安排</div>' +
+                    '<div class="detail-sub">本月概览</div>' +
+                    '</div>' +
+                    '<div class="detail-box">' +
+                    '<div class="row"><span>出勤天数</span><b>' + (cnt ? cnt.work : 0) + ' 天</b></div>' +
+                    '<div class="row"><span>放假天数</span><b>' + (cnt ? cnt.holiday : 0) + ' 天</b></div>' +
+                    '<div class="row"><span>休息天数</span><b>' + (cnt ? cnt.rest : 0) + ' 天</b></div>' +
+                    '</div>' +
+                    '<div class="detail-actions">' +
+                    '<button class="btn-ghost" onclick="openDay(getToday())">查看今天</button>' +
+                    '</div>';
                 return;
             }
             box.className = 'cal-detail';
